@@ -2,15 +2,7 @@ cc.Class({
     extends: cc.Component,
 
     properties: {
-        // foo: {
-        //    default: null,
-        //    url: cc.Texture2D,  // optional, default is typeof default
-        //    serializable: true, // optional, default is true
-        //    visible: true,      // optional, default is true
-        //    displayName: 'Foo', // optional
-        //    readonly: false,    // optional, default is false
-        // },
-        // ... 
+  
         Col:0,
         Row:0,
         Padding:0,
@@ -74,7 +66,7 @@ cc.Class({
             var arr=[];
             for(var j=0;j<this.Col;j++){
                 var position=cc.v2(beginX+i*(eleSize.width+this.SpacingX),beginY+j*(eleSize.height+this.SpacingY));
-                window.console.log(position.toString());
+                // window.console.log(position.toString());
                 arr.push(position);
             }
             this.pSet.push(arr);
@@ -84,18 +76,18 @@ cc.Class({
     addTouchEvents:function(node){//添加触摸监听事件
         var p1=null;
         var p2=null;
-        window.console.log("m"+this);
+        // window.console.log("m"+this);
         node.on('touchstart',function(event){//传回节点位置
             node.select=true;
             p1=node.getComponent('Star').pos;
-            window.console.log(p1);
+            // window.console.log(p1);
         },this);
         node.on('touchmove',function(event){
             if(node.select){
                 var x=event.getLocationX();
                 var y=event.getLocationY();
                 node.setPosition(x,y);
-                window.console.log(x+" "+y);
+                // window.console.log(x+" "+y);
             }
         },this);
         node.on('touchend',function(event){
@@ -103,9 +95,9 @@ cc.Class({
             var x=event.getLocationX();
             var y=event.getLocationY();
             p2=this.PositionToPos(x,y);
-            window.console.log(p2);
+            // window.console.log(p2);
             if(this.isAround(p1,p2)&&typeof(this.stars[p2.x][p2.y])!='undefined'){
-                window.console.log('isAround');
+                // window.console.log('isAround');
                 this.changeTwoPos(p1,p2);
 
                 this.check();//check
@@ -123,12 +115,12 @@ cc.Class({
     PositionToPos:function(x,y){//屏幕坐标转矩阵坐标
         var ele=cc.instantiate(this.star);
         var eleSize=ele.getContentSize();
-        var pos=cc.v2(Math.floor((x-this.Padding)/(eleSize.width+this.SpacingX)),Math.floor((y-this.Padding)/(eleSize.height+this.SpacingY)));
+        var pos=cc.v2(Math.floor(x/(eleSize.width+this.SpacingX)),Math.floor((y-this.Padding)/(eleSize.height+this.SpacingY)));
         return pos;
     },
     isAround:function(p1,p2){//判断矩阵坐标p2是否与p1相邻
         var dis=Math.abs((p2.x-p1.x)+(p2.y-p1.y));
-        window.console.log(dis);
+        // window.console.log(dis);
         if(dis==1){
             return true;
         }
@@ -142,8 +134,6 @@ cc.Class({
         var t=this.stars[p1.x][p1.y];
         this.stars[p1.x][p1.y]=this.stars[p2.x][p2.y];
         this.stars[p2.x][p2.y]=t;
-        
-        
     },
     delAndDrop:function(){
         
@@ -156,7 +146,7 @@ cc.Class({
         var count2=this.horizontalCheckConnected();
 
         this.reward=this.calScore(count1+count2);//奖励分数
-        window.console.log(this.reward +"rew");
+        // window.console.log(this.reward +"rew");
 
         return ((count1+count2)>0)?true:false;
     },

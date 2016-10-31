@@ -17,7 +17,7 @@ cc.Class({
             type:cc.SpriteFrame
         },
         pos:{
-            default:new cc.Vec2
+            default:new cc.Vec2()
         },
         number:0,
         sfIndex:0,
