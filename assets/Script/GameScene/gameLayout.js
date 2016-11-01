@@ -22,9 +22,12 @@ cc.Class({
     stars:null,
     mask:null,
     onLoad: function () {
+        this.beginX = 0;
+        this.beginY = 0
         this.buildCoordinateSet();//根据配置信息生成每个元素的坐标点集合
         this.init();
         this.check();
+        cc.log(this.node.width)
         
     },
     init:function(){//初始化函数，生成star节点，添加监听事件
@@ -58,14 +61,13 @@ cc.Class({
     buildCoordinateSet:function(){//根据配置信息生成每个元素的坐标点对象
         var ele=cc.instantiate(this.star);
         var eleSize=ele.getContentSize();
-        var beginX=(this.node.width-(this.Row-1)*(this.SpacingX+eleSize.width))/2;
-        var beginY=this.Padding+eleSize.height/2;
-        
+        this.beginX=(this.node.width-(this.Row-1)*(this.SpacingX+eleSize.width))/2;
+        this.beginY=this.Padding+eleSize.height/2;
         this.pSet=[];        
         for(var i=0;i<this.Row;i++){
             var arr=[];
             for(var j=0;j<this.Col;j++){
-                var position=cc.v2(beginX+i*(eleSize.width+this.SpacingX),beginY+j*(eleSize.height+this.SpacingY));
+                 var position=cc.v2( this.beginX+i*(eleSize.width+this.SpacingX),this.beginY+j*(eleSize.height+this.SpacingY));
                 // window.console.log(position.toString());
                 arr.push(position);
             }
@@ -73,21 +75,27 @@ cc.Class({
         }
         
     },
+    PositionToPos:function(x,y){//屏幕坐标转矩阵坐标
+        var ele=cc.instantiate(this.star);
+        var eleSize=ele.getContentSize();
+        var pos=cc.v2(Math.floor((x - this.beginX)/(eleSize.width+this.SpacingX)+0.5),Math.floor((y-this.beginY)/(eleSize.height+this.SpacingY)+0.5));
+        return pos;
+    },
     addTouchEvents:function(node){//添加触摸监听事件
         var p1=null;
         var p2=null;
-        // window.console.log("m"+this);
+        window.console.log("m"+this);
         node.on('touchstart',function(event){//传回节点位置
             node.select=true;
             p1=node.getComponent('Star').pos;
-            // window.console.log(p1);
+             window.console.log('p1',p1);
         },this);
         node.on('touchmove',function(event){
             if(node.select){
                 var x=event.getLocationX();
                 var y=event.getLocationY();
                 node.setPosition(x,y);
-                // window.console.log(x+" "+y);
+                 window.console.log('x,y',x+" "+y);
             }
         },this);
         node.on('touchend',function(event){
@@ -95,9 +103,9 @@ cc.Class({
             var x=event.getLocationX();
             var y=event.getLocationY();
             p2=this.PositionToPos(x,y);
-            // window.console.log(p2);
+             window.console.log('p2',p2);
             if(this.isAround(p1,p2)&&typeof(this.stars[p2.x][p2.y])!='undefined'){
-                // window.console.log('isAround');
+                window.console.log('isAround');
                 this.changeTwoPos(p1,p2);
 
                 this.check();//check
@@ -112,12 +120,7 @@ cc.Class({
         
     },
     
-    PositionToPos:function(x,y){//屏幕坐标转矩阵坐标
-        var ele=cc.instantiate(this.star);
-        var eleSize=ele.getContentSize();
-        var pos=cc.v2(Math.floor(x/(eleSize.width+this.SpacingX)),Math.floor((y-this.Padding)/(eleSize.height+this.SpacingY)));
-        return pos;
-    },
+ 
     isAround:function(p1,p2){//判断矩阵坐标p2是否与p1相邻
         var dis=Math.abs((p2.x-p1.x)+(p2.y-p1.y));
         // window.console.log(dis);
@@ -248,7 +251,7 @@ cc.Class({
     },
 
     deleteConnected:function(){//根据mask的状态信息删除相连的star
-        
+          var pSet=this.pSet;
         for(var i=0;i<this.Row;i++){
             var count=0;
             var start=0,end;
@@ -259,6 +262,11 @@ cc.Class({
                         start=j;
                         onoff=false;
                     }
+                    var ele=cc.instantiate(this.star);
+                    ele.setPosition(pSet[i][7].x,pSet[i][7].y);
+                    this.node.addChild(ele,0,"ele");
+                    this.addTouchEvents(ele);
+                    this.stars[i].push(ele)
                     var act=cc.sequence(cc.blink(0.2,1),cc.scaleBy(0.5,0,0));//消失动画
                     this.stars[i][j].runAction(act);
                 }

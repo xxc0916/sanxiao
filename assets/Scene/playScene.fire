@@ -66,8 +66,8 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 540,
-      "height": 960
+      "width": 640,
+      "height": 1008
     },
     "_children": [
       {
@@ -80,8 +80,8 @@
     "_scaleY": 1,
     "_position": {
       "__type__": "cc.Vec2",
-      "x": 270,
-      "y": 480
+      "x": 320,
+      "y": 504
     },
     "_skewX": 0,
     "_skewY": 0,
@@ -122,8 +122,8 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 540,
-      "height": 960
+      "width": 640,
+      "height": 1008
     },
     "_children": [
       {
@@ -139,8 +139,8 @@
     "_scaleY": 1,
     "_position": {
       "__type__": "cc.Vec2",
-      "x": -270,
-      "y": -480
+      "x": -320,
+      "y": -504
     },
     "_skewX": 0,
     "_skewY": 0,
@@ -198,7 +198,7 @@
     "_position": {
       "__type__": "cc.Vec2",
       "x": 67.805,
-      "y": 915
+      "y": 963
     },
     "_skewX": 0,
     "_skewY": 0,
@@ -310,8 +310,8 @@
     "_scaleY": 1,
     "_position": {
       "__type__": "cc.Vec2",
-      "x": 319.26,
-      "y": 915
+      "x": 369.26,
+      "y": 963
     },
     "_skewX": 0,
     "_skewY": 0,
@@ -449,7 +449,7 @@
       "__id__": 3
     },
     "_enabled": true,
-    "Col": 10,
+    "Col": 8,
     "Row": 8,
     "Padding": 100,
     "SpacingX": 10,
@@ -471,8 +471,8 @@
     "_enabled": true,
     "_designResolution": {
       "__type__": "cc.Size",
-      "width": 540,
-      "height": 960
+      "width": 640,
+      "height": 1008
     },
     "_fitWidth": true,
     "_fitHeight": false
