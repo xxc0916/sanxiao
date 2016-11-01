@@ -26,10 +26,13 @@ cc.Class({
         this.beginY = 0
         this.buildCoordinateSet();//根据配置信息生成每个元素的坐标点集合
         this.init();
-        this.check();
-        cc.log(this.node.width)
+         //this.check();
+        
         
     },
+     start:function(){
+       this.check();  
+     },
     init:function(){//初始化函数，生成star节点，添加监听事件
         var node=this.node;
         this.mask=[];
@@ -61,6 +64,7 @@ cc.Class({
     buildCoordinateSet:function(){//根据配置信息生成每个元素的坐标点对象
         var ele=cc.instantiate(this.star);
         var eleSize=ele.getContentSize();
+        this.eleSize =eleSize
         this.beginX=(this.node.width-(this.Row-1)*(this.SpacingX+eleSize.width))/2;
         this.beginY=this.Padding+eleSize.height/2;
         this.pSet=[];        
@@ -76,17 +80,19 @@ cc.Class({
         
     },
     PositionToPos:function(x,y){//屏幕坐标转矩阵坐标
-        var ele=cc.instantiate(this.star);
-        var eleSize=ele.getContentSize();
-        var pos=cc.v2(Math.floor((x - this.beginX)/(eleSize.width+this.SpacingX)+0.5),Math.floor((y-this.beginY)/(eleSize.height+this.SpacingY)+0.5));
+      
+        var pos=cc.v2(Math.floor((x - this.beginX)/(this.eleSize.width+this.SpacingX)+0.5),Math.floor((y-this.beginY)/(this.eleSize.height+this.SpacingY)+0.5));
         return pos;
     },
     addTouchEvents:function(node){//添加触摸监听事件
         var p1=null;
         var p2=null;
-        window.console.log("m"+this);
+       // window.console.log("m"+this);
+       var cur=null
         node.on('touchstart',function(event){//传回节点位置
             node.select=true;
+            node.zIndex = 1
+             cur=node.position
             p1=node.getComponent('Star').pos;
              window.console.log('p1',p1);
         },this);
@@ -94,22 +100,33 @@ cc.Class({
             if(node.select){
                 var x=event.getLocationX();
                 var y=event.getLocationY();
+                if(x>=(cur.x - this.eleSize.width-this.SpacingX)&&x<=(cur.x + this.eleSize.width+this.SpacingX )&&
+                y<=(cur.y + this.eleSize.height+this.SpacingY)&&y>=(cur.y - this.eleSize.height-this.SpacingY))
+                {
                 node.setPosition(x,y);
-                 window.console.log('x,y',x+" "+y);
+                 //window.console.log('x,y',x+" "+y);
+                }
+                // else{
+                //      node.setPosition(this.pSet[p1.x][p1.y]);
+                // }
             }
         },this);
         node.on('touchend',function(event){
             node.select=false;
+            node.zIndex = 0
             var x=event.getLocationX();
             var y=event.getLocationY();
             p2=this.PositionToPos(x,y);
              window.console.log('p2',p2);
             if(this.isAround(p1,p2)&&typeof(this.stars[p2.x][p2.y])!='undefined'){
-                window.console.log('isAround');
+                //window.console.log('isAround');
                 this.changeTwoPos(p1,p2);
-
-                this.check();//check
-                
+                   
+            if(this.checkConnected()){
+                this.delAndDrop();
+            }else{
+               this.changeTwoPos(p2,p1);
+            }
             }else{
                 node.setPosition(this.pSet[p1.x][p1.y]);
             }
@@ -263,7 +280,7 @@ cc.Class({
                         onoff=false;
                     }
                     var ele=cc.instantiate(this.star);
-                    ele.setPosition(pSet[i][7].x,pSet[i][7].y);
+                    ele.setPosition(pSet[i][this.Col-1].x,pSet[i][this.Col-1].y);
                     this.node.addChild(ele,0,"ele");
                     this.addTouchEvents(ele);
                     this.stars[i].push(ele)
@@ -273,7 +290,6 @@ cc.Class({
                 if((this.mask[i][j-1]!=1||j-1<0)&&onoff==false){
                     end=j;
                     this.stars[i].splice(end,start-end+1);//删除star实例
-                    
                     onoff=true;
                 }
                 this.mask[i][j]=0;
