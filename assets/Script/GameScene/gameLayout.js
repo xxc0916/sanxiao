@@ -107,7 +107,7 @@ cc.Class({
                  //window.console.log('x,y',x+" "+y);
                 }
                 // else{
-                //      node.setPosition(this.pSet[p1.x][p1.y]);
+                //      node.setPosition(cur);
                 // }
             }
         },this);
