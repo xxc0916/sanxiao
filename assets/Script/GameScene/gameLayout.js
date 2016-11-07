@@ -15,7 +15,8 @@ cc.Class({
         Score:{
             default:null,
             type:cc.Node
-        }
+        },
+        canvas:cc.Node
     },
     reward:0,
     pSet:null,//坐标矩阵集合
@@ -27,6 +28,7 @@ cc.Class({
         this.buildCoordinateSet();//根据配置信息生成每个元素的坐标点集合
         this.init();
          //this.check();
+         this.touch()
         
         
     },
@@ -45,7 +47,8 @@ cc.Class({
                 var ele=cc.instantiate(this.star);
                 ele.setPosition(pSet[i][j].x,pSet[i][j].y);
                 node.addChild(ele,0,"ele");
-                this.addTouchEvents(ele);
+                // pSet[i][j] =ele
+                //this.addTouchEvents(ele);
                 var com=ele.getComponent('Star');
                 com.pos=cc.v2(i,j);
                 arr1.push(ele);
@@ -84,59 +87,116 @@ cc.Class({
         var pos=cc.v2(Math.floor((x - this.beginX)/(this.eleSize.width+this.SpacingX)+0.5),Math.floor((y-this.beginY)/(this.eleSize.height+this.SpacingY)+0.5));
         return pos;
     },
-    addTouchEvents:function(node){//添加触摸监听事件
-        var p1=null;
-        var p2=null;
-       // window.console.log("m"+this);
-       var cur=null
-        node.on('touchstart',function(event){//传回节点位置
-            node.select=true;
-            node.zIndex = 1
-             cur=node.position
-            p1=node.getComponent('Star').pos;
-             window.console.log('p1',p1);
-        },this);
-        node.on('touchmove',function(event){
-            if(node.select){
-                var x=event.getLocationX();
-                var y=event.getLocationY();
-                if(x>=(cur.x - this.eleSize.width-this.SpacingX)&&x<=(cur.x + this.eleSize.width+this.SpacingX )&&
-                y<=(cur.y + this.eleSize.height+this.SpacingY)&&y>=(cur.y - this.eleSize.height-this.SpacingY))
-                {
-                node.setPosition(x,y);
-                 //window.console.log('x,y',x+" "+y);
-                }
-                // else{
-                //      node.setPosition(cur);
-                // }
-            }
-        },this);
-        node.on('touchend',function(event){
-            node.select=false;
-            node.zIndex = 0
-            var x=event.getLocationX();
-            var y=event.getLocationY();
-            p2=this.PositionToPos(x,y);
-             window.console.log('p2',p2);
-            if(this.isAround(p1,p2)&&typeof(this.stars[p2.x][p2.y])!='undefined'){
-                //window.console.log('isAround');
-                this.changeTwoPos(p1,p2);
+    // addTouchEvents:function(node){//添加触摸监听事件
+    //     this.p1=null;
+    //     var p2=null;
+    //   // window.console.log("m"+this);
+    //   var cur=null
+    //     node.on('touchstart',function(event){//传回节点位置
+    //         node.select=true;
+    //         node.zIndex = 1
+    //          cur=node.position
+    //         this.p1=node.getComponent('Star').pos;
+    //          window.console.log('p1',this.p1);
+    //     },this);
+    //     node.on('touchmove',function(event){
+    //         if(node.select){
+    //             var x=event.getLocationX();
+    //             var y=event.getLocationY();
+    //             if(x>=(cur.x - this.eleSize.width-this.SpacingX)&&x<=(cur.x + this.eleSize.width+this.SpacingX )&&
+    //             y<=(cur.y + this.eleSize.height+this.SpacingY)&&y>=(cur.y - this.eleSize.height-this.SpacingY))
+    //             {
+    //             node.setPosition(x,y);
+    //              //window.console.log('x,y',x+" "+y);
+    //             }
+    //             // else{
+    //             //      node.setPosition(cur);
+    //             // }
+    //         }
+    //     },this);
+    //     this.canvas.on('touchend',function(event){
+         
+    //         node.select=false;
+    //         node.zIndex = 0
+    //         var x=event.getLocationX();
+    //         var y=event.getLocationY();
+    //         var p=this.canvas.convertToNodeSpace(event.getLocation());
+    //         // cc.log('p',p)
+    //         p2=this.PositionToPos(p.x,p.y);
+    //          window.console.log('p2',p2);
+    //          //cc.log('p2',p2.x)
+    //             var cell = this.stars[p2.x][p2.y]
+    //             cc.log(cell)
+    //         if(this.isAround(this.p1,p2)&&typeof(this.stars[p2.x][p2.y])!='undefined'){
+    //             //window.console.log('isAround');
+    //             this.changeTwoPos(this.p1,p2);
                    
-            if(this.checkConnected()){
-                this.delAndDrop();
-            }else{
-               this.changeTwoPos(p2,p1);
-            }
-            }else{
-                node.setPosition(this.pSet[p1.x][p1.y]);
-            }
+    //         if(this.checkConnected()){
+    //             this.delAndDrop();
+    //         }else{
+    //           this.changeTwoPos(p2,this.p1);
+    //         }
+    //         }else{
+    //           // node.setPosition(this.pSet[this.p1.x][this.p1.y]);
+    //         }
             
-        },this);
+    //     },this);
 
         
         
+    // },
+        touch:function(){
+         this.node.on('touchstart',function(event){//传回节点位置
+            cc.log('touchstart')
+             var p=this.node.convertToNodeSpace(event.getLocation());
+             this.p1=this.PositionToPos(p.x,p.y);
+             if(this.p1.x <0||this.p1.x >this.Row -1||this.p1.y<0||this.p1.y>this.Col-1){
+                 return
+             }
+             cc.log('p1',this.p1)
+             this.cell1 = this.stars[this.p1.x][this.p1.y]
+             this.cur =this.pSet[this.p1.x][this.p1.y]
+             this.cell1.select =true
+             this.cell1.zIndex = 1
+        },this);
+        this.node.on('touchmove',function(event){
+            cc.log('touchmove')
+            if(this.cell1.select){
+                var x=event.getLocationX();
+                var y=event.getLocationY();
+                 if(x>=(this.cur.x - this.eleSize.width-this.SpacingX)&&x<=(this.cur.x + this.eleSize.width+this.SpacingX )&&
+                y<=(this.cur.y + this.eleSize.height+this.SpacingY)&&y>=(this.cur.y - this.eleSize.height-this.SpacingY))
+                {
+                this.cell1.setPosition(x,y);
+                 }
+            }
+                
+        },this);
+        this.node.on('touchend',function(event){
+            cc.log('touchend')
+           
+             var p=this.node.convertToNodeSpace(event.getLocation());
+             this.p2=this.PositionToPos(p.x,p.y);
+             if(this.p2.x <0||this.p2.x >this.Row -1||this.p2.y<0||this.p2.y>this.Col-1){
+                 this.cell1.setPosition(this.cur);
+                 return
+             }
+            cc.log('p2',this.p2)
+            this.cell1.select =false
+            this.cell1.zIndex = 0
+             this.cell2 = this.stars[this.p2.x][this.p2.y]
+             if(this.isAround(this.p1,this.p2)&&typeof(this.stars[this.p2.x][this.p2.y]) !='undefined'){
+                 this.changeTwoPos(this.p1,this.p2);
+                  if(this.checkConnected()){
+                this.delAndDrop();
+            }else{
+              this.changeTwoPos(this.p2,this.p1);
+            }
+             }else{
+              this.cell1.setPosition(this.cur);
+             }
+        },this);
     },
-    
  
     isAround:function(p1,p2){//判断矩阵坐标p2是否与p1相邻
         var dis=Math.abs((p2.x-p1.x)+(p2.y-p1.y));
@@ -282,7 +342,7 @@ cc.Class({
                     var ele=cc.instantiate(this.star);
                     ele.setPosition(pSet[i][this.Col-1].x,pSet[i][this.Col-1].y);
                     this.node.addChild(ele,0,"ele");
-                    this.addTouchEvents(ele);
+                    //this.addTouchEvents(ele);
                     this.stars[i].push(ele)
                     var act=cc.sequence(cc.blink(0.2,1),cc.scaleBy(0.5,0,0));//消失动画
                     this.stars[i][j].runAction(act);
