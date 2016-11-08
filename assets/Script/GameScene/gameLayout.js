@@ -73,7 +73,7 @@ cc.Class({
         this.pSet=[];        
         for(var i=0;i<this.Row;i++){
             var arr=[];
-            for(var j=0;j<this.Col;j++){
+            for(var j=0;j<this.Col+1;j++){
                  var position=cc.v2( this.beginX+i*(eleSize.width+this.SpacingX),this.beginY+j*(eleSize.height+this.SpacingY));
                 // window.console.log(position.toString());
                 arr.push(position);
@@ -340,7 +340,7 @@ cc.Class({
                         onoff=false;
                     }
                     var ele=cc.instantiate(this.star);
-                    ele.setPosition(pSet[i][this.Col-1].x,pSet[i][this.Col-1].y);
+                    ele.setPosition(pSet[i][this.Col].x,pSet[i][this.Col].y);
                     this.node.addChild(ele,0,"ele");
                     //this.addTouchEvents(ele);
                     this.stars[i].push(ele)
